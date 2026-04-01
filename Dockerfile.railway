@@ -1,0 +1,23 @@
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+WORKDIR /app
+
+# Copy python project files
+COPY python/pyproject.toml python/uv.lock ./
+
+# Pre-cache dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-install-project
+
+# Copy the rest of the application
+COPY python/ ./
+
+# Install the application
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked
+
+EXPOSE 8000
+
+CMD ["uv", "run", "python", "-m", "valuecell.server.main"]
