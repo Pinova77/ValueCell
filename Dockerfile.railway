@@ -4,14 +4,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
-# Copy python project files
+# Copy Python project files from python/ subdirectory
 COPY python/pyproject.toml python/uv.lock ./
 
 # Pre-cache dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-install-project
 
-# Copy the rest of the application
+# Copy the Python source code
 COPY python/ ./
 
 # Install the application
